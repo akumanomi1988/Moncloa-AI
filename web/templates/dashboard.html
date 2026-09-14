@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Moncloa-AI{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Dashboard</h2>
+        <div class="flex gap-2">
+            <button onclick="checkNow()" class="bg-emerald-700 hover:bg-emerald-600 px-4 py-2 rounded text-sm font-medium transition">
+                Comprobar ahora
+            </button>
+            <button id="pauseBtn" onclick="togglePause()" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded text-sm font-medium transition">
+                {{ "Reanudar" if engine_status == "paused" else "Pausar" }}
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <p class="text-gray-400 text-sm">Estado del Motor</p>
+            <p class="text-xl font-bold" id="engine-status">{{ engine_status }}</p>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <p class="text-gray-400 text-sm">Decisiones Tomadas</p>
+            <p class="text-xl font-bold">{{ stats.completed }}</p>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <p class="text-gray-400 text-sm">Aprobaci&oacute;n Actual</p>
+            <p class="text-xl font-bold">{{ state.get('approval', 'N/A') }}{% if state.get('approval') %}%{% endif %}</p>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <p class="text-gray-400 text-sm">Issues pendientes</p>
+            <p class="text-xl font-bold" id="pending-count">{{ pending_count }}</p>
+        </div>
+    </div>
+
+    <div class="bg-gray-900 p-4 rounded-lg border border-gray-800 mb-8">
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <h3 class="font-bold">Evoluci&oacute;n nacional</h3>
+                <p class="text-xs text-gray-500">Snapshots guardados por el motor</p>
+            </div>
+            <span id="chart-delta" class="text-xs text-gray-400">Sin datos suficientes</span>
+        </div>
+        <svg id="approval-chart" viewBox="0 0 800 190" class="w-full h-48" role="img" aria-label="Evolución de la aprobación"></svg>
+        <div class="flex gap-4 text-xs text-gray-500 mt-2">
+            <span class="text-emerald-400">● Aprobaci&oacute;n</span>
+            <span class="text-sky-400">● Econom&iacute;a</span>
+            <span class="text-violet-400">● Libertades</span>
+        </div>
+        <svg id="indicators-chart" viewBox="0 0 800 190" class="w-full h-48 mt-2" role="img" aria-label="Evolución de economía y libertades"></svg>
+    </div>
+
+    <div class="bg-gray-900 p-4 rounded-lg border border-gray-800 mb-8">
+        <h3 class="font-bold mb-3">Estado de la Naci&oacute;n: {{ state.get('fullname') or state.get('name') or 'Hispan ia' }}</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div><span class="text-gray-400">Poblaci&oacute;n:</span> {{ "{:,}".format(state.population) if state.get('population') else 'N/A' }}</div>
+            <div><span class="text-gray-400">Econom&iacute;a:</span> {{ state.get('economy') or 'N/A' }}</div>
+            <div><span class="text-gray-400">D&eacute;ficit:</span> {{ state.get('deficit') or 'N/A' }}</div>
+            <div><span class="text-gray-400">Ind. &uacute;nica:</span> {{ state.get('industry') or 'N/A' }}</div>
+            <div><span class="text-gray-400">Libertad Civil:</span> {{ state.get('civil_rights') or 'N/A' }}</div>
+            <div><span class="text-gray-400">Libertad Econ&oacute;mica:</span> {{ state.get('economy_freedom') or 'N/A' }}</div>
+            <div><span class="text-gray-400">Libertad Pol&iacute;tica:</span> {{ state.get('political_freedom') or 'N/A' }}</div>
+        </div>
+    </div>
+
+    <div class="bg-gray-900 p-4 rounded-lg border border-gray-800 mb-8" id="activity-panel">
+        <h3 class="font-bold mb-3">Actividad en Vivo</h3>
+        <div id="activity-log" class="space-y-1 text-sm max-h-60 overflow-y-auto">
+            <p class="text-gray-500">Esperando actividad...</p>
+        </div>
+    </div>
+
+    <h3 class="font-bold mb-3">&Uacute;ltimas Decisiones</h3>
+    <div class="space-y-2" id="recent-list">
+        {% for s in recent %}
+        <a href="/consejo/{{ s.id }}" class="block bg-gray-900 p-3 rounded-lg border border-gray-800 hover:border-emerald-700 transition">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="font-medium">{{ s.issue_title }}</p>
+                    <p class="text-sm text-gray-400">Estado: {{ s.status }} | Resultado: Opci&oacute;n {{ s.outcome or '&mdash;' }}</p>
+                    {% if s.summary %}<p class="text-xs text-gray-500 mt-1">{{ s.summary }}</p>{% endif %}
+                </div>
+                <span class="text-xs text-gray-500">{{ s.started_at[:10] if s.started_at else '' }}</span>
+            </div>
+        </a>
+        {% else %}
+        <p class="text-gray-500" id="no-decisions">No hay decisiones a&uacute;n.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+(function() {
+    var activityEl = document.getElementById('activity-log');
+    var engineStatusEl = document.getElementById('engine-status');
+    var ws;
+
+    function addActivity(msg) {
+        var p = document.createElement('p');
+        p.className = 'text-emerald-400';
+        p.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+        activityEl.appendChild(p);
+        if (activityEl.children.length > 50) activityEl.removeChild(activityEl.firstChild);
+        activityEl.scrollTop = activityEl.scrollHeight;
+    }
+
+    function connect() {
+      ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+      ws.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var ev = data.event;
+
+        if (ev === 'snapshot') {
+            addActivity('Datos de la naci&oacute;n actualizados');
+            engineStatusEl.textContent = 'running';
+        } else if (ev === 'no_issues') {
+            addActivity('No hay issues pendientes');
+        } else if (ev === 'issues_found') {
+            addActivity('Se encontraron ' + data.count + ' issues pendientes');
+        } else if (ev === 'intervention') {
+            addActivity(data.name + ' (' + data.role + ') vot&oacute; ' + data.vote + ' [Fase ' + data.phase + ']');
+        } else if (ev === 'phase_changed') {
+            addActivity('La deliberación entra en fase ' + data.phase + ' (' + data.status + ')');
+        } else if (ev === 'session_started') {
+            addActivity('NUEVO ISSUE: ' + (data.issue ? data.issue.title : '?'));
+        } else if (ev === 'session_completed') {
+            addActivity('DECISI&Oacute;N TOMADA: ' + data.issue_title + ' &rarr; Opci&oacute;n ' + data.outcome);
+            setTimeout(function() { location.reload(); }, 2000);
+        } else if (ev === 'session_failed') {
+            addActivity('ERROR en ' + data.issue_title + ': ' + data.error);
+        }
+      };
+
+      ws.onopen = function() { addActivity('Conectado al servidor en tiempo real'); };
+      ws.onclose = function() { addActivity('Conexión en tiempo real perdida; reintentando...'); setTimeout(connect, 3000); };
+      ws.onerror = function() { ws.close(); };
+    }
+    connect();
+
+    function drawApprovalChart(snapshots) {
+      var svg = document.getElementById('approval-chart');
+      if (!svg || !snapshots || snapshots.length < 2) return;
+      var values = snapshots.map(function(s) { return Number(s.approval) || 0; });
+      var min = Math.max(0, Math.min.apply(null, values) - 5);
+      var max = Math.min(100, Math.max.apply(null, values) + 5);
+      var points = values.map(function(value, i) {
+        var x = 30 + (i * 740 / (values.length - 1));
+        var y = 165 - ((value - min) / Math.max(1, max - min) * 135);
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      }).join(' ');
+      svg.innerHTML = '<line x1="30" y1="165" x2="770" y2="165" stroke="#374151"/>' +
+        '<polyline points="' + points + '" fill="none" stroke="#34d399" stroke-width="3" stroke-linejoin="round"/>' +
+        '<text x="35" y="25" fill="#9ca3af" font-size="12">' + values[values.length - 1].toFixed(1) + '%</text>';
+      var delta = values[values.length - 1] - values[0];
+      document.getElementById('chart-delta').textContent = (delta >= 0 ? '+' : '') + delta.toFixed(1) + ' puntos en el periodo';
+    }
+    function drawIndicatorChart(snapshots) {
+      var svg = document.getElementById('indicators-chart');
+      var series = [
+        {key: 'economy_score', color: '#38bdf8'},
+        {key: 'freedom_score', color: '#a78bfa'}
+      ];
+      if (!svg || snapshots.length < 2) return;
+      var available = series.filter(function(item) { return snapshots.some(function(s) { return s[item.key] != null; }); });
+      if (!available.length) { svg.innerHTML = '<text x="30" y="95" fill="#6b7280" font-size="13">Se necesitan nuevos snapshots con puntuaciones para mostrar estas series.</text>'; return; }
+      svg.innerHTML = '<line x1="30" y1="165" x2="770" y2="165" stroke="#374151"/>';
+      available.forEach(function(item) {
+        var values = snapshots.map(function(s) { return Number(s[item.key]) || 0; });
+        var points = values.map(function(value, i) {
+          var x = 30 + (i * 740 / (values.length - 1));
+          var y = 165 - (value / 100 * 135);
+          return x.toFixed(1) + ',' + y.toFixed(1);
+        }).join(' ');
+        svg.innerHTML += '<polyline points="' + points + '" fill="none" stroke="' + item.color + '" stroke-width="2"/>';
+      });
+    }
+    fetch('/api/progress?limit=60').then(function(r) { return r.json(); }).then(function(d) { drawApprovalChart(d.snapshots); drawIndicatorChart(d.snapshots); }).catch(function() {});
+})();
+
+function checkNow() {
+    fetch('/api/check-now', {method:'POST'}).then(function() {
+        var el = document.getElementById('activity-log');
+        var p = document.createElement('p');
+        p.className = 'text-yellow-400';
+        p.textContent = '[' + new Date().toLocaleTimeString() + '] Comprobando issues...';
+        el.appendChild(p);
+    });
+}
+
+function togglePause() {
+    var btn = document.getElementById('pauseBtn');
+    var isPaused = btn.textContent.trim() === 'Reanudar';
+    var url = isPaused ? '/api/loop/resume' : '/api/loop/pause';
+    fetch(url, {method:'POST'}).then(function() {
+        btn.textContent = isPaused ? 'Pausar' : 'Reanudar';
+        document.getElementById('engine-status').textContent = isPaused ? 'running' : 'paused';
+    });
+}
+</script>
+{% endblock %}

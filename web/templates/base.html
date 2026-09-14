@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Moncloa-AI{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="h-full bg-gray-950 text-gray-100 font-sans">
+    <div class="flex h-full">
+        {% include "sidebar.html" %}
+        <main class="flex-1 overflow-auto p-6 ml-64">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+    // Highlight active sidebar link
+    (function() {
+        var path = window.location.pathname;
+        document.querySelectorAll('nav a').forEach(function(a) {
+            if (a.getAttribute('href') === path) {
+                a.classList.add('bg-gray-800', 'text-emerald-400');
+            }
+        });
+    })();
+    </script>
+</body>
+</html>

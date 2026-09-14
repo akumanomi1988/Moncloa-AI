@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Consejo de Ministros - Moncloa-AI{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-start mb-6">
+        <div>
+            <h2 class="text-2xl font-bold">{{ session.issue_title }}</h2>
+            <p class="text-sm text-gray-400 mt-1">
+                {% set opts = session.options|from_json if session.options is string else session.options %}
+                {% if opts is iterable and opts is not string %}
+                    Opciones: {% set option_ids = session.option_ids|from_json if session.option_ids is string else session.option_ids %}
+                    {% for opt in opts %}
+                        <span class="inline-block bg-gray-800 px-2 py-0.5 rounded text-xs mr-1">ID {{ option_ids[loop.index0] if option_ids else loop.index0 }}: {{ opt[:60] }}{{ '...' if opt|length > 60 }}</span>
+                    {% endfor %}
+                {% endif %}
+            </p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-sm bg-gray-800 px-3 py-1 rounded-full
+                {% if session.status == 'completed' %}text-emerald-400 border border-emerald-800
+                {% elif session.status == 'error' %}text-red-400 border border-red-800
+                {% else %}text-yellow-400 border border-yellow-800{% endif %}">
+                {{ session.status }}
+            </span>
+            {% if session.outcome %}
+            <span class="text-sm bg-emerald-900 text-emerald-300 px-3 py-1 rounded-full font-bold">
+                Decisi&oacute;n: Opci&oacute;n {{ session.outcome }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-gray-900 p-5 rounded-lg border border-gray-800 mb-8">
+        <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="font-bold">El Dilema</h3>
+        </div>
+        <p class="text-gray-300 leading-relaxed whitespace-pre-line">{{ session.issue_description }}</p>
+    </div>
+
+    {% set phase_labels = {1: 'Análisis Individual', 2: 'Deliberación', 3: 'Votación Final'} %}
+    {% set phase_colors = {1: 'from-blue-900 to-blue-950 border-blue-800', 2: 'from-purple-900 to-purple-950 border-purple-800', 3: 'from-emerald-900 to-emerald-950 border-emerald-800'} %}
+    {% set speaker_colors = {'presidente': 'border-l-amber-500 bg-amber-900/20', 'economia': 'border-l-sky-500 bg-sky-900/20', 'sociales': 'border-l-rose-500 bg-rose-900/20', 'justicia': 'border-l-violet-500 bg-violet-900/20'} %}
+    {% set speaker_icons = {'presidente': '👤', 'economia': '💰', 'sociales': '🤝', 'justicia': '⚖️'} %}
+
+    {% set phases = interventions|map(attribute='phase')|unique|list|sort %}
+
+    <div class="space-y-8" id="conversation-thread">
+        {% for phase in phases %}
+        {% set phase_invs = interventions|selectattr('phase', 'eq', phase)|list %}
+        {% set rounds = phase_invs|map(attribute='round')|unique|list|sort %}
+
+        <div>
+            <div class="flex items-center gap-3 mb-4 sticky top-0 z-10">
+                <div class="h-px flex-1 bg-gradient-to-r {{ phase_colors.get(phase, 'from-gray-800 to-gray-800') }}"></div>
+                <span class="text-sm font-bold px-4 py-1 rounded-full border bg-gray-950 {{ phase_colors.get(phase, 'border-gray-800') }}">
+                    Fase {{ phase }}: {{ phase_labels.get(phase, 'Fase ' ~ phase) }}
+                </span>
+                <div class="h-px flex-1 bg-gradient-to-l {{ phase_colors.get(phase, 'from-gray-800 to-gray-800') }}"></div>
+            </div>
+
+            {% for round in rounds %}
+            {% set round_invs = phase_invs|selectattr('round', 'eq', round)|list %}
+
+            {% if rounds|length > 1 %}
+            <div class="text-center mb-3">
+                <span class="text-xs text-gray-600 bg-gray-900 px-2 py-0.5 rounded">Ronda {{ round }}</span>
+            </div>
+            {% endif %}
+
+            <div class="space-y-3">
+                {% for inv in round_invs %}
+                {% set color = speaker_colors.get(inv.councilor_role, 'border-l-gray-500 bg-gray-800') %}
+                {% set icon = speaker_icons.get(inv.councilor_role, '💬') %}
+
+                <div class="ml-{% if inv.councilor_role == 'presidente' %}8{% else %}0{% endif %}">
+                    <div class="border-l-4 {{ color }} rounded-r-lg p-4 shadow-lg">
+                        <div class="flex items-start justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">{{ icon }}</span>
+                                <div>
+                                    <span class="font-bold text-sm">{{ inv.councilor_name }}</span>
+                                    <span class="text-xs text-gray-500 ml-2">@{{ inv.councilor_role }}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                {% if inv.vote_choice %}
+                                <span class="text-xs font-bold px-2 py-0.5 rounded-full
+                                    {% if inv.councilor_role == 'presidente' %}bg-amber-900 text-amber-300
+                                    {% elif inv.councilor_role == 'economia' %}bg-sky-900 text-sky-300
+                                    {% elif inv.councilor_role == 'sociales' %}bg-rose-900 text-rose-300
+                                    {% else %}bg-violet-900 text-violet-300{% endif %}">
+                                    Vota: {{ inv.vote_choice }}
+                                </span>
+                                {% endif %}
+                                <span class="text-xs text-gray-600">{{ inv.created_at[11:19] if inv.created_at else '' }}</span>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-200 leading-relaxed whitespace-pre-line">{{ inv.reasoning or inv.content or '' }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        {% if not interventions %}
+        <div class="text-center py-12">
+            <p class="text-gray-500">No hay intervenciones registradas para esta sesi&oacute;n.</p>
+            <p class="text-gray-600 text-sm mt-1">Los consejeros a&uacute;n no han deliberado.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if session.status == 'completed' and session.outcome %}
+    <div class="mt-8 bg-gradient-to-r from-emerald-900/30 to-emerald-950/30 border border-emerald-800 rounded-lg p-6 text-center">
+        <p class="text-sm text-emerald-400 mb-1">Decisi&oacute;n Final del Consejo de Ministros</p>
+        <p class="text-2xl font-bold text-emerald-300">Opci&oacute;n {{ session.outcome }}</p>
+        <p class="text-xs text-gray-500 mt-2">Sesi&oacute;n #{{ session.id }} &middot; {{ session.ended_at or session.started_at }}</p>
+    </div>
+    {% endif %}
+    {% if session.status == 'error' %}
+    <div class="mt-8 bg-red-950/30 border border-red-800 rounded-lg p-5">
+        <p class="text-red-300 font-bold">La deliberación no terminó correctamente</p>
+        <p class="text-sm text-red-200/80 mt-1">{{ session.error_message or 'Error no especificado' }}</p>
+        <button onclick="retrySession()" class="mt-4 bg-red-800 hover:bg-red-700 px-4 py-2 rounded text-sm">Reintentar deliberación</button>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+(function() {
+    var sessionId = {{ session.id }};
+    var ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+    ws.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        if ((data.event === 'intervention' || data.event === 'session_completed') && data.session_id == sessionId) {
+            setTimeout(function() { location.reload(); }, 500);
+        }
+    };
+})();
+function retrySession() {
+    fetch('/api/session/{{ session.id }}/retry', {method: 'POST'})
+        .then(function(response) { return response.json(); })
+        .then(function() { location.reload(); });
+}
+</script>
+{% endblock %}

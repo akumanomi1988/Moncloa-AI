@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block title %}Reglas del Juego - Moncloa-AI{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto prose prose-invert">
+    <h1>C&oacute;mo funciona NationStates</h1>
+    <p class="text-gray-400 text-lg">Manual simplificado para entender el juego y c&oacute;mo nuestro Consejo de Ministros toma decisiones.</p>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>&iquest;Qu&eacute; es NationStates?</h2>
+    <p>
+        NationStates es un simulador pol&iacute;tico online donde <strong>t&uacute; creas y gestionas tu propio pa&iacute;s</strong>.
+        No hay un objetivo final ni se "gana" &mdash; es un experimento social donde tus decisiones moldean la sociedad de tu naci&oacute;n.
+        Cada cierto tiempo recibes <strong>dilemas pol&iacute;ticos</strong> (llamados "Issues") y debes elegir qu&eacute; hacer.
+        Cada decisi&oacute;n tiene consecuencias en los indicadores de tu pa&iacute;s.
+    </p>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>Los Tres Ejes Pol&iacute;ticos</h2>
+    <p>
+        Tu naci&oacute;n se mide en tres ejes principales. Cada decisi&oacute;n que tomas mueve estos indicadores:
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 not-prose my-6">
+        <div class="bg-gray-900 p-4 rounded-lg border border-blue-800">
+            <h3 class="text-blue-400 font-bold text-sm mb-2">Derechos Civiles</h3>
+            <p class="text-gray-300 text-sm">Libertad de expresi&oacute;n, privacidad, igualdad ante la ley. &iquest;Tu gobierno respeta los derechos individuales o los restringe por "seguridad"?</p>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-emerald-800">
+            <h3 class="text-emerald-400 font-bold text-sm mb-2">Econom&iacute;a</h3>
+            <p class="text-gray-300 text-sm">&iquest;Mercado libre o econom&iacute;a planificada? &iquest;Impuestos bajos o estado del bienestar? &iquest;Empresas privadas o nacionalizadas?</p>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-purple-800">
+            <h3 class="text-purple-400 font-bold text-sm mb-2">Libertad Pol&iacute;tica</h3>
+            <p class="text-gray-300 text-sm">&iquest;Democracia participativa o autoritarismo? &iquest;Los ciudadanos eligen a sus gobernantes o hay censura y represi&oacute;n?</p>
+        </div>
+    </div>
+
+    <h3>Los 27 Tipos de Gobierno</h3>
+    <p>
+        Seg&uacute;n c&oacute;mo se combinen los tres ejes, tu naci&oacute;n recibe una etiqueta de entre <strong>27 tipos de gobierno</strong> posibles.
+        Algunos ejemplos:
+    </p>
+    <ul>
+        <li><strong>Anarqu&iacute;a</strong> &mdash; M&aacute;ximas libertades en todo</li>
+        <li><strong>Para&iacute;so Libertario</strong> &mdash; Libertad total pero con algo de orden</li>
+        <li><strong>Estado del Bienestar</strong> &mdash; Econom&iacute;a regulada, derechos fuertes</li>
+        <li><strong>Capitalismo de Mano Dura</strong> &mdash; Mercado libre, autoritarismo</li>
+        <li><strong>Dictadura</strong> &mdash; M&iacute;nimas libertades en todo</li>
+        <li><strong>Comunismo</strong> &mdash; Econom&iacute;a planificada, poco mercado</li>
+        <li><strong>Democracia Liberal</strong> &mdash; Equilibrio entre libertad y orden</li>
+    </ul>
+    <p>Tu naci&oacute;n <strong>Hispan ia</strong> tiene su propio tipo de gobierno seg&uacute;n las decisiones que se hayan tomado hasta ahora.</p>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>Los Issues (Dilemas)</h2>
+    <p>
+        Los issues son la mec&aacute;nica principal del juego. Cada cierto tiempo (varias veces al d&iacute;a) recibes un dilema pol&iacute;tico.
+        Por ejemplo:
+    </p>
+    <div class="bg-gray-900 p-4 rounded-lg border border-gray-800 not-prose my-4">
+        <p class="text-gray-300 italic">"Un movimiento ciudadano propone legalizar el cannabis medicinal. Los grupos conservadores se oponen. &iquest;Qu&eacute; haces?"</p>
+        <div class="mt-2 space-y-1 text-sm">
+            <p class="text-gray-400"><span class="text-emerald-400 font-bold">A.</span> Legalizar con regulaci&oacute;n estatal</p>
+            <p class="text-gray-400"><span class="text-emerald-400 font-bold">B.</span> Mantener la prohibici&oacute;n actual</p>
+            <p class="text-gray-400"><span class="text-emerald-400 font-bold">C.</span> Descriminalizar sin legalizar</p>
+        </div>
+    </div>
+    <p>Cada opci&oacute;n tiene efectos diferentes en los tres ejes. No hay opci&oacute;n "correcta" &mdash; solo decisiones con consecuencias.</p>
+
+    <h3>&iquest;C&oacute;mo aparecen los issues?</h3>
+    <ul>
+        <li>Aparecen autom&aacute;ticamente cada ~4-8 horas mientras juegas</li>
+        <li>Puedes tener hasta <strong>10 issues acumulados</strong> como m&aacute;ximo</li>
+        <li>Si no los resuelves, se acumulan y dejan de aparecer nuevos</li>
+        <li>Tambi&eacute;n puedes <strong>descartar</strong> un issue si ning&uacute;na opci&oacute;n te convence</li>
+    </ul>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>La Asamblea Mundial (World Assembly)</h2>
+    <p>
+        Es una organizaci&oacute;n internacional donde las naciones votan leyes globales.
+        Similar a la ONU, pero con poder real: las resoluciones aprobadas afectan a <strong>todas</strong> las naciones miembros.
+    </p>
+    <ul>
+        <li>Unirse es voluntario</li>
+        <li>Los miembros pueden proponer y votar resoluciones</li>
+        <li>Las resoluciones tratan sobre derechos humanos, econom&iacute;a, medio ambiente, etc.</li>
+        <li>Para aprobarse, una resoluci&oacute;n necesita mayor&iacute;a simple</li>
+    </ul>
+    <p>Nuestro sistema actualmente <strong>no vota en la Asamblea Mundial</strong>, solo gestiona los issues internos de la naci&oacute;n.</p>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>Objetivos y C&oacute;mo "Ganar"</h2>
+    <p>
+        <strong>No hay una forma de ganar</strong> en NationStates. No hay puntuaci&oacute;n final, ni niveles que superar, ni enemigos que derrotar.
+        Es un simulador, no un juego competitivo.
+    </p>
+    <p>Pero los jugadores suelen fijarse objetivos propios:</p>
+    <ul>
+        <li><strong>Mantener alta la aprobaci&oacute;n</strong> &mdash; Si la aprobaci&oacute;n baja de 0, tu gobierno cae y tu naci&oacute;n se reinicia</li>
+        <li><strong>Alcanzar un tipo de gobierno concreto</strong> &mdash; Por ejemplo, llegar a ser una "Democracia Liberal" o un "Para&iacute;so Libertario"</li>
+        <li><strong>Coherencia ideol&oacute;gica</strong> &mdash; Mantener tus decisiones alineadas con una visi&oacute;n pol&iacute;tica</li>
+        <li><strong>Crecer en poblaci&oacute;n</strong> &mdash; Las buenas decisiones atraen inmigrantes</li>
+        <li><strong>Participar en la Asamblea Mundial</strong> &mdash; Influir en la pol&iacute;tica global</li>
+    </ul>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>C&oacute;mo decide nuestro Consejo de Ministros</h2>
+    <p>
+        Moncloa-AI automatiza la gesti&oacute;n de tu naci&oacute;n usando inteligencia artificial.
+        Cuando llega un nuevo issue, sigue este proceso:
+    </p>
+
+    <div class="space-y-4 not-prose my-6">
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">1</span>
+                <div>
+                    <h3 class="font-bold text-emerald-400">An&aacute;lisis Individual</h3>
+                    <p class="text-sm text-gray-400">Los 4 miembros del Consejo analizan el issue por separado y dan su voto inicial con argumentos.</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">2</span>
+                <div>
+                    <h3 class="font-bold text-purple-400">Deliberaci&oacute;n</h3>
+                    <p class="text-sm text-gray-400">El Presidente resume las posturas. Los ministros debaten, pueden cambiar de opini&oacute;n o proponer alternativas. El Presidente decide cu&aacute;ndo cerrar el debate.</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">3</span>
+                <div>
+                    <h3 class="font-bold text-amber-400">Votaci&oacute;n</h3>
+                    <p class="text-sm text-gray-400">Se cuentan los votos. El Presidente tiene voto de calidad (vale 2). Si hay consenso, se aprueba. Si no, el Presidente impone.</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-lg border border-gray-800">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">4</span>
+                <div>
+                    <h3 class="font-bold text-blue-400">Ejecuci&oacute;n</h3>
+                    <p class="text-sm text-gray-400">La decisi&oacute;n se env&iacute;a a NationStates, se guarda en la base de datos y se genera un acta con la conversaci&oacute;n completa.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Los 4 miembros del Consejo</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose my-4">
+        <div class="bg-amber-900/20 border-l-4 border-amber-500 p-4 rounded-r-lg">
+            <h4 class="font-bold text-amber-400">👤 Presidente</h4>
+            <p class="text-sm text-gray-400">Pragmatismo centrista. Busca la estabilidad y el consenso. Modera el debate y tiene voto de calidad.</p>
+        </div>
+        <div class="bg-sky-900/20 border-l-4 border-sky-500 p-4 rounded-r-lg">
+            <h4 class="font-bold text-sky-400">💰 Ministro de Econom&iacute;a</h4>
+            <p class="text-sm text-gray-400">Liberal-conservador. Prioriza la disciplina fiscal y la confianza empresarial. Se opone al gasto sin financiaci&oacute;n.</p>
+        </div>
+        <div class="bg-rose-900/20 border-l-4 border-rose-500 p-4 rounded-r-lg">
+            <h4 class="font-bold text-rose-400">🤝 Ministro de Derechos Sociales</h4>
+            <p class="text-sm text-gray-400">Progresista socialdem&oacute;crata. Defiende la igualdad, los derechos civiles y el estado del bienestar.</p>
+        </div>
+        <div class="bg-violet-900/20 border-l-4 border-violet-500 p-4 rounded-r-lg">
+            <h4 class="font-bold text-violet-400">⚖️ Ministro de Justicia</h4>
+            <p class="text-sm text-gray-400">Institucionalista. Vela por la legalidad, la constituci&oacute;n y la seguridad jur&iacute;dica. Act&uacute;a como &aacute;rbitro.</p>
+        </div>
+    </div>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>Indicadores Clave</h2>
+    <p>El estado de tu naci&oacute;n se mide con estos indicadores:</p>
+    <div class="bg-gray-900 p-4 rounded-lg border border-gray-800 not-prose my-4">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-gray-400 border-b border-gray-800">
+                    <th class="text-left py-2">Indicador</th>
+                    <th class="text-left py-2">Qu&eacute; significa</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 font-bold text-emerald-400">Aprobaci&oacute;n</td>
+                    <td class="py-2 text-gray-300">Popularidad del gobierno. Si llega a 0%, tu gobierno cae y la naci&oacute;n se reinicia.</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 font-bold">Poblaci&oacute;n</td>
+                    <td class="py-2 text-gray-300">N&uacute;mero de habitantes. Crece con decisiones populares.</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 font-bold text-sky-400">Econom&iacute;a</td>
+                    <td class="py-2 text-gray-300">Descripci&oacute;n del estado econ&oacute;mico (ej: "Fuerte", "En crecimiento").</td>
+                </tr>
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 font-bold">D&eacute;ficit</td>
+                    <td class="py-2 text-gray-300">Diferencia entre ingresos y gastos del estado.</td>
+                </tr>
+                <tr>
+                    <td class="py-2 font-bold">Industria &uacute;nica</td>
+                    <td class="py-2 text-gray-300">El sector econ&oacute;mico principal de tu naci&oacute;n.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="border-gray-800 my-8">
+
+    <h2>Consejos para entender las decisiones</h2>
+    <ul>
+        <li><strong>No hay decisiones malas</strong> &mdash; Cada opci&oacute;n tiene trade-offs. Lo que ganas en econom&iacute;a lo pierdes en derechos civiles, y viceversa.</li>
+        <li><strong>El Consejo tiene personalidad</strong> &mdash; Cada ministro defiende su ideolog&iacute;a. El Presidente busca el equilibrio.</li>
+        <li><strong>Las decisiones pasadas importan</strong> &mdash; El sistema recuerda decisiones similares y las usa como contexto para ser coherente.</li>
+        <li><strong>Puedes modificar las personalidades</strong> &mdash; En la pesta&ntilde;a "Configurar" puedes ajustar la ideolog&iacute;a de cada consejero para ver c&oacute;mo cambian las decisiones.</li>
+    </ul>
+
+    <hr class="border-gray-800 my-8">
+
+    <p class="text-center text-gray-500 text-sm">
+        NationStates fue creado por Max Barry en 2002. Moncloa-AI es una herramienta aut&oacute;noma que utiliza IA local para gestionar tu naci&oacute;n.
+        <br>
+        M&aacute;s informaci&oacute;n: <a href="https://www.nationstates.net/" class="text-emerald-400 hover:text-emerald-300">nationstates.net</a>
+    </p>
+</div>
+{% endblock %}

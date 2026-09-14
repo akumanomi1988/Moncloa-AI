@@ -1,0 +1,9 @@
+body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+.truncate-multiline {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.prose { max-width: none; }
+.prose br { margin-bottom: 0.5rem; }

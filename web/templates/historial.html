@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Historial - Moncloa-AI{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h2 class="text-2xl font-bold mb-6">Historial de Decisiones</h2>
+
+    {% if sessions %}
+    <div class="space-y-3">
+        {% for s in sessions %}
+        <a href="/consejo/{{ s.id }}" class="block bg-gray-900 rounded-lg border border-gray-800 hover:border-emerald-700 transition overflow-hidden">
+            <div class="p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="font-bold text-base">{{ s.issue_title }}</h3>
+                    <div class="flex items-center gap-2 shrink-0 ml-4">
+                        {% if s.is_simulation %}
+                        <span class="text-xs bg-yellow-900 text-yellow-300 px-2 py-0.5 rounded">SIMULACI&Oacute;N</span>
+                        {% endif %}
+                        <span class="text-xs
+                            {% if s.status == 'completed' %}text-emerald-400
+                            {% elif s.status == 'error' %}text-red-400
+                            {% else %}text-yellow-400{% endif %}">
+                            {{ s.status }}
+                        </span>
+                        {% if s.outcome %}
+                        <span class="text-xs font-bold bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded">
+                            Opci&oacute;n {{ s.outcome }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% set opts = s.options|from_json if s.options is string else s.options %}
+                {% if opts is iterable and opts is not string %}
+                <div class="flex flex-wrap gap-1 mb-2">
+                    {% set letters = ['A','B','C','D','E','F','G','H'] %}
+                    {% for opt in opts %}
+                    <span class="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded
+                        {% if s.outcome and letters[loop.index0] == s.outcome %}ring-1 ring-emerald-600 text-emerald-400{% endif %}">
+                        {{ letters[loop.index0] }}: {{ opt[:50] }}{{ '...' if opt|length > 50 }}
+                    </span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <p class="text-sm text-gray-500 mb-2">{{ (s.issue_description or '')[:200] }}{{ '...' if s.issue_description and s.issue_description|length > 200 }}</p>
+                {% if s.summary %}<p class="text-sm text-gray-300 border-l-2 border-emerald-700 pl-3 mb-3">{{ s.summary }}</p>{% endif %}
+
+                <div class="flex justify-between text-xs text-gray-600">
+                    <span>{{ s.started_at[:16] if s.started_at else '' }}</span>
+                    <span class="text-emerald-500 hover:text-emerald-400">Ver conversaci&oacute;n completa &rarr;</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-16">
+        <svg class="w-16 h-16 text-gray-800 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="text-gray-500 text-lg">No hay decisiones registradas todav&iacute;a.</p>
+        <p class="text-gray-600 text-sm mt-2">Las decisiones aparecer&aacute;n aqu&iacute; cuando el Consejo de Ministros comience a deliberar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
