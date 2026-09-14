@@ -1,0 +1,34 @@
+<svg width="1600" height="520" viewBox="0 0 1600 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Moncloa-AI — El Gobierno que nunca duerme</title>
+  <desc id="desc">Banner oscuro con una red neuronal dorada y turquesa alrededor del nombre Moncloa-AI.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#07111F"/><stop offset="0.52" stop-color="#12103A"/><stop offset="1" stop-color="#041E2A"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="220" y1="70" x2="1400" y2="450" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EEAD4"/><stop offset="0.5" stop-color="#A78BFA"/><stop offset="1" stop-color="#FBBF24"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="26"/></filter>
+  </defs>
+  <rect width="1600" height="520" rx="28" fill="url(#bg)"/>
+  <ellipse cx="810" cy="260" rx="540" ry="180" fill="#14B8A6" opacity="0.11" filter="url(#blur)">
+    <animate attributeName="rx" values="540;610;540" dur="7s" repeatCount="indefinite"/>
+  </ellipse>
+  <g opacity="0.22" stroke="#94A3B8" stroke-width="1">
+    <path d="M0 100H1600M0 200H1600M0 300H1600M0 400H1600"/><path d="M200 0V520M400 0V520M600 0V520M800 0V520M1000 0V520M1200 0V520M1400 0V520"/>
+  </g>
+  <g stroke="url(#glow)" stroke-width="3" stroke-linecap="round" opacity="0.65">
+    <path d="M180 386C390 90 560 470 800 170S1190 95 1430 360" stroke-dasharray="12 18"><animate attributeName="stroke-dashoffset" from="0" to="-120" dur="5s" repeatCount="indefinite"/></path>
+    <path d="M180 128C430 430 590 68 800 350S1190 420 1430 120" stroke-dasharray="8 22"><animate attributeName="stroke-dashoffset" from="0" to="180" dur="8s" repeatCount="indefinite"/></path>
+  </g>
+  <g fill="#5EEAD4">
+    <circle cx="180" cy="386" r="7"><animate attributeName="r" values="5;11;5" dur="2s" repeatCount="indefinite"/></circle>
+    <circle cx="800" cy="170" r="7"><animate attributeName="r" values="7;13;7" dur="2.7s" repeatCount="indefinite"/></circle>
+    <circle cx="1430" cy="360" r="7"><animate attributeName="r" values="5;11;5" dur="2.3s" repeatCount="indefinite"/></circle>
+  </g>
+  <g fill="#FBBF24" opacity="0.8"><circle cx="340" cy="94" r="3"/><circle cx="1250" cy="80" r="3"/><circle cx="1370" cy="440" r="3"/><circle cx="260" cy="450" r="3"/></g>
+  <text x="800" y="245" text-anchor="middle" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800" letter-spacing="8">MONCLOA-AI</text>
+  <text x="800" y="310" text-anchor="middle" fill="#99F6E4" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" letter-spacing="5">CONSEJO DE MINISTROS AUTÓNOMO</text>
+  <text x="800" y="370" text-anchor="middle" fill="#CBD5E1" font-family="Arial, Helvetica, sans-serif" font-size="18" letter-spacing="2">OBSERVA · DELIBERA · GOBIERNA</text>
+  <rect x="32" y="32" width="1536" height="456" rx="22" stroke="#5EEAD4" stroke-opacity="0.25"/>
+</svg>
